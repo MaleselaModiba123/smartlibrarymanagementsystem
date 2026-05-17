@@ -158,3 +158,77 @@ Even though both extend UserAccount, Member and Librarian have distinctly differ
 
 **Notification as a standalone class:**
 Notifications could have been handled as simple messages, but making Notification a full class allows the system to track the status of each alert, archive them, and link them back to the member they belong to. This supports the state transitions defined in STATE-DIAGRAMS.md.
+
+---
+
+## Repository Layer Class Diagram
+
+The diagram below shows the repository interfaces and implementations added in Assignment 11.
+
+```mermaid
+classDiagram
+
+    class Repository {
+        <<interface>>
+        +save(entity: T): void
+        +findById(id: ID): Optional~T~
+        +findAll(): List~T~
+        +delete(id: ID): void
+    }
+
+    class BookRepository {
+        <<interface>>
+        +findByAuthor(author: String): List~Book~
+        +findByGenre(genre: String): List~Book~
+        +findAvailable(): List~Book~
+    }
+
+    class MemberRepository {
+        <<interface>>
+        +findByEmail(email: String): Optional~Member~
+        +findByAccountStatus(status: String): List~Member~
+    }
+
+    class LoanRepository {
+        <<interface>>
+        +findByMemberId(memberId: String): List~Loan~
+        +findByBookId(bookId: String): List~Loan~
+        +findOverdue(): List~Loan~
+        +findByStatus(status: String): List~Loan~
+    }
+
+    class InMemoryBookRepository {
+        -storage: Map~String, Book~
+        +save(book: Book): void
+        +findById(id: String): Optional~Book~
+        +findAll(): List~Book~
+        +delete(id: String): void
+        +findByAuthor(author: String): List~Book~
+        +findByGenre(genre: String): List~Book~
+        +findAvailable(): List~Book~
+    }
+
+    class RepositoryFactory {
+        +getBookRepository(storageType: String): BookRepository
+        +getMemberRepository(storageType: String): MemberRepository
+        +getLoanRepository(storageType: String): LoanRepository
+        +getReservationRepository(storageType: String): ReservationRepository
+        +getFineRepository(storageType: String): FineRepository
+    }
+
+    class DatabaseBookRepository {
+        +save(book: Book): void
+        +findById(id: String): Optional~Book~
+        +findAll(): List~Book~
+        +delete(id: String): void
+    }
+
+    BookRepository --|> Repository : extends
+    MemberRepository --|> Repository : extends
+    LoanRepository --|> Repository : extends
+    InMemoryBookRepository ..|> BookRepository : implements
+    DatabaseBookRepository ..|> BookRepository : implements
+    RepositoryFactory --> BookRepository : creates
+    RepositoryFactory --> MemberRepository : creates
+    RepositoryFactory --> LoanRepository : creates
+```
