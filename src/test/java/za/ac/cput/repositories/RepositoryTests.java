@@ -251,4 +251,69 @@ public class RepositoryTests {
             repo.findAll();
         });
     }
+
+    @Test
+    public void testRepositoryFactory_ReturnsInMemoryMemberRepository() {
+        MemberRepository repo = RepositoryFactory.getMemberRepository("MEMORY");
+        assertNotNull(repo);
+        assertTrue(repo instanceof InMemoryMemberRepository);
+    }
+
+    @Test
+    public void testRepositoryFactory_ReturnsInMemoryLoanRepository() {
+        LoanRepository repo = RepositoryFactory.getLoanRepository("MEMORY");
+        assertNotNull(repo);
+        assertTrue(repo instanceof InMemoryLoanRepository);
+    }
+
+    @Test
+    public void testRepositoryFactory_ReturnsInMemoryReservationRepository() {
+        ReservationRepository repo = RepositoryFactory.getReservationRepository("MEMORY");
+        assertNotNull(repo);
+        assertTrue(repo instanceof InMemoryReservationRepository);
+    }
+
+    @Test
+    public void testRepositoryFactory_ReturnsInMemoryFineRepository() {
+        FineRepository repo = RepositoryFactory.getFineRepository("MEMORY");
+        assertNotNull(repo);
+        assertTrue(repo instanceof InMemoryFineRepository);
+    }
+
+    @Test
+    public void testRepositoryFactory_StorageTypeIsCaseInsensitiveAndTrimmed() {
+        assertNotNull(RepositoryFactory.getBookRepository("  memory  "));
+        assertNotNull(RepositoryFactory.getMemberRepository("Database"));
+    }
+
+    @Test
+    public void testRepositoryFactory_NullStorageType_ThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            RepositoryFactory.getLoanRepository(null);
+        });
+    }
+
+    @Test
+    public void testRepositoryFactory_DatabaseMemberRepository_ThrowsUnsupportedOperation() {
+        MemberRepository repo = RepositoryFactory.getMemberRepository("DATABASE");
+        assertThrows(UnsupportedOperationException.class, repo::findAll);
+    }
+
+    @Test
+    public void testRepositoryFactory_DatabaseLoanRepository_ThrowsUnsupportedOperation() {
+        LoanRepository repo = RepositoryFactory.getLoanRepository("DATABASE");
+        assertThrows(UnsupportedOperationException.class, repo::findAll);
+    }
+
+    @Test
+    public void testRepositoryFactory_DatabaseReservationRepository_ThrowsUnsupportedOperation() {
+        ReservationRepository repo = RepositoryFactory.getReservationRepository("DATABASE");
+        assertThrows(UnsupportedOperationException.class, repo::findAll);
+    }
+
+    @Test
+    public void testRepositoryFactory_DatabaseFineRepository_ThrowsUnsupportedOperation() {
+        FineRepository repo = RepositoryFactory.getFineRepository("DATABASE");
+        assertThrows(UnsupportedOperationException.class, repo::findAll);
+    }
 }
